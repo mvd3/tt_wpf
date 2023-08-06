@@ -52,7 +52,7 @@ namespace TeleTrader
                 StatusLabel.Text = "CONNECTING";
 
                 try
-                {
+                { //Connect to database and try to retrieve all data
                     _db = new(_openFileDialog.FileName);
                     Task typesTask = RetrieveTypes();
                     Task exchangeTask = RetrieveExchanges();
@@ -68,6 +68,7 @@ namespace TeleTrader
                     return;
                 }
 
+                // Fetch all data to elements
                 StatusLabel.Text = "CONNECTED";
                 TypeComboBox.SelectedItem = _allTypes[0];
                 ExchangeComboBox.SelectedItem = _allExchanges[0];
@@ -77,7 +78,7 @@ namespace TeleTrader
 
         private void TypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count == 0)
+            if (e.AddedItems.Count == 0) // No element selected
                 return;
 
             long id = ((Type)e.AddedItems[0]).Id;
@@ -95,7 +96,7 @@ namespace TeleTrader
 
         private void ExchangeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count == 0)
+            if (e.AddedItems.Count == 0) // No element selected
                 return;
 
             long id = ((Exchange)e.AddedItems[0]).Id;
@@ -113,7 +114,7 @@ namespace TeleTrader
 
         private void DataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
-            if (e.AddedCells.Count > 0)
+            if (e.AddedCells.Count > 0) //Some row is selected
             {
                 _selectedId = (e.AddedCells[0].Item as DataGridItem).Id;
                 EditButton.IsEnabled = true;
@@ -169,12 +170,12 @@ namespace TeleTrader
             try
             {
                 sym = _db.Symbols.Single(x => x.Id == _selectedId);
-                _db.Symbols.Entry(sym).State = EntityState.Modified;
+                _db.Symbols.Entry(sym).State = EntityState.Modified; // Change state so that it will be saved in database
                 _dataDialog = new DataDialog(sym, _allExchanges.Where(x => x.Id >= 0).ToList(), _allTypes.Where(x => x.Id >= 0).ToList(), 1);
                 _dataDialog.ShowDialog();
             } catch
             {
-                if (sym != null)
+                if (sym != null) // Restore state
                     _db.Symbols.Entry(sym).State = EntityState.Detached;
                 return;
             }
@@ -203,7 +204,7 @@ namespace TeleTrader
                     }
                     catch
                     {
-                        _db.Symbols.Entry(sym).State = EntityState.Detached;
+                        _db.Symbols.Entry(sym).State = EntityState.Detached; // Restore state
                         MessageBox.Show("An error occured");
                     }
                     break;
@@ -227,7 +228,7 @@ namespace TeleTrader
                     RefreshDataGrid();
                 } catch
                 {
-                    if (sym != null)
+                    if (sym != null) // Restore state
                         _db.Symbols.Entry(sym).State = EntityState.Detached;
                     MessageBox.Show("Error, couldn't delete entry.");
                 }
@@ -271,14 +272,14 @@ namespace TeleTrader
         private async Task RetrieveTypes()
         {
             _allTypes = await _db.Types.ToListAsync();
-            _allTypes.Insert(0, new Type { Id = -1, Name = "All"});
+            _allTypes.Insert(0, new Type { Id = -1, Name = "All"}); // Value not found in database, that's why the index is negative
             TypeComboBox.ItemsSource = _allTypes;
         }
 
         private async Task RetrieveExchanges()
         {
             _allExchanges = await _db.Exchanges.ToListAsync();
-            _allExchanges.Insert(0, new Exchange { Id = -1, Name = "All"});
+            _allExchanges.Insert(0, new Exchange { Id = -1, Name = "All"}); // Value not found in database, that's why the index is negative
             ExchangeComboBox.ItemsSource = _allExchanges;
         }
 

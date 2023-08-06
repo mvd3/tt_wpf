@@ -44,6 +44,7 @@ namespace TeleTrader
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
+            //Validate all values
             if (SymbolNameTextBox.Text.Length == 0)
             {
                 MessageBox.Show("Symbol name field can't be empty");
@@ -75,6 +76,7 @@ namespace TeleTrader
                 return;
             }
 
+            //Write them in Symbol object
             CurrentSymbol.Name = SymbolNameTextBox.Text;
             CurrentSymbol.Ticker = TickerTextBox.Text;
             CurrentSymbol.ExchangeId = ((Exchange)ExchangeComboBox.SelectedItem).Id;
