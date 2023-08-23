@@ -1,5 +1,5 @@
 
-# TeleTrader Project
+# TT Project
 
 ## Framework/libraries used
 
