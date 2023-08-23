@@ -1,5 +1,5 @@
 
-# TT Project
+# Project
 
 ## Framework/libraries used
 
